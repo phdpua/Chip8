@@ -1,5 +1,5 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Chip8Emulator;
+﻿using Chip8Emulator;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Chip8Tests
 {
@@ -10,6 +10,7 @@ namespace Chip8Tests
         /// 0NNN Calls RCA 1802 program at address NNN.
         /// </summary>
         [TestMethod]
+        [Ignore]
         public void Opcode0NNNTest1()
         {
         }
@@ -18,14 +19,26 @@ namespace Chip8Tests
         /// 00E0 Clears the screen.
         /// </summary>
         [TestMethod]
+        [Ignore]
         public void Opcode00E0Test1()
         {
+            byte[] rom = new byte[] { };
+            Chip8 cpu = GetCpuInstance(rom);
+
+            for (int x = 0; x < cpu.ScreenData.GetUpperBound(0); x++)
+            {
+                for (int y = 0; y < cpu.ScreenData.GetUpperBound(1); y++)
+                {
+                    Assert.AreEqual(0, cpu.ScreenData[x, y, 0]);
+                }
+            }
         }
 
         /// <summary>
         /// 00EE Returns from a subroutine.
         /// </summary>
         [TestMethod]
+        [Ignore]
         public void Opcode00EETest1()
         {
         }
@@ -297,6 +310,40 @@ namespace Chip8Tests
         [TestMethod]
         public void Opcode8XY4Test1()
         {
+            byte[] rom = new byte[]
+            {
+                0x61, // Set 0xFF to V1
+                0xFF,
+                0x62, // Set 0x01 to V2
+                0x01,
+                0x81, // Set V1 = V1 + V2
+                0x24
+            };
+            Chip8 cpu = GetCpuInstance(rom);
+
+            Assert.AreEqual(0x00, cpu.Registers[0x01]);
+            Assert.AreEqual(0x01, cpu.Registers[0x0F]);
+        }
+
+                /// <summary>
+        /// 8XY4 Adds VY to VX. VF is set to 1 when there's a carry, and to 0 when there isn't.
+        /// </summary>
+        [TestMethod]
+        public void Opcode8XY4Test2()
+        {
+            byte[] rom = new byte[]
+            {
+                0x61, // Set 0xFE to V1
+                0xFE,
+                0x62, // Set 0x01 to V2
+                0x01,
+                0x81, // Set V1 = V1 + V2
+                0x24
+            };
+            Chip8 cpu = GetCpuInstance(rom);
+
+            Assert.AreEqual(0xFF, cpu.Registers[0x01]);
+            Assert.AreEqual(0x00, cpu.Registers[0x0F]);
         }
 
         /// <summary>
@@ -305,6 +352,40 @@ namespace Chip8Tests
         [TestMethod]
         public void Opcode8XY5Test1()
         {
+            byte[] rom = new byte[]
+            {
+                0x61, // Set 0xFE to V1
+                0xFE,
+                0x62, // Set 0x01 to V2
+                0x01,
+                0x81, // Set V1 = V1 - V2
+                0x25
+            };
+            Chip8 cpu = GetCpuInstance(rom);
+
+            Assert.AreEqual(0xFD, cpu.Registers[0x01]);
+            Assert.AreEqual(0x01, cpu.Registers[0x0F]);
+        }
+
+        /// <summary>
+        /// 8XY5 VY is subtracted from VX. VF is set to 0 when there's a borrow, and 1 when there isn't.
+        /// </summary>
+        [TestMethod]
+        public void Opcode8XY5Test2()
+        {
+            byte[] rom = new byte[]
+            {
+                0x61, // Set 0x0A to V1
+                0x0A,
+                0x62, // Set 0x0B to V2
+                0x0B,
+                0x81, // Set V1 = V1 - V2
+                0x25
+            };
+            Chip8 cpu = GetCpuInstance(rom);
+
+            Assert.AreEqual(0xFF, cpu.Registers[0x01]);
+            Assert.AreEqual(0x00, cpu.Registers[0x0F]);
         }
 
         /// <summary>
@@ -313,6 +394,36 @@ namespace Chip8Tests
         [TestMethod]
         public void Opcode8XY6Test1()
         {
+            byte[] rom = new byte[]
+            {
+                0x61, // Set 0x08 to V1
+                0x08,
+                0x81, // Shift V1
+                0x06
+            };
+            Chip8 cpu = GetCpuInstance(rom);
+
+            Assert.AreEqual(0x04, cpu.Registers[0x01]);
+            Assert.AreEqual(0x00, cpu.Registers[0x0F]);
+        }
+
+        /// <summary>
+        /// 8XY6 Shifts VX right by one. VF is set to the value of the least significant bit of VX before the shift.
+        /// </summary>
+        [TestMethod]
+        public void Opcode8XY6Test2()
+        {
+            byte[] rom = new byte[]
+            {
+                0x61, // Set 0x09 to V1
+                0x09,
+                0x81, // Shift V1 to right
+                0x06
+            };
+            Chip8 cpu = GetCpuInstance(rom);
+
+            Assert.AreEqual(0x04, cpu.Registers[0x01]);
+            Assert.AreEqual(0x01, cpu.Registers[0x0F]);
         }
 
         /// <summary>
@@ -321,6 +432,40 @@ namespace Chip8Tests
         [TestMethod]
         public void Opcode8XY7Test1()
         {
+            byte[] rom = new byte[]
+            {
+                0x61, // Set 0x09 to V1
+                0x09,
+                0x62, // Set 0x0A to V2
+                0x0A,
+                0x81, // V1 = V2 - V1
+                0x27
+            };
+            Chip8 cpu = GetCpuInstance(rom);
+
+            Assert.AreEqual(0x01, cpu.Registers[0x01]);
+            Assert.AreEqual(0x01, cpu.Registers[0x0F]);
+        }
+
+        /// <summary>
+        /// 8XY7 Sets VX to VY minus VX. VF is set to 0 when there's a borrow, and 1 when there isn't.
+        /// </summary>
+        [TestMethod]
+        public void Opcode8XY7Test2()
+        {
+            byte[] rom = new byte[]
+            {
+                0x61, // Set 0x09 to V1
+                0x09,
+                0x62, // Set 0x0A to V2
+                0x08,
+                0x81, // V1 = V2 - V1
+                0x27
+            };
+            Chip8 cpu = GetCpuInstance(rom);
+
+            Assert.AreEqual(0xFF, cpu.Registers[0x01]);
+            Assert.AreEqual(0x00, cpu.Registers[0x0F]);
         }
 
         /// <summary>
@@ -329,6 +474,36 @@ namespace Chip8Tests
         [TestMethod]
         public void Opcode8XYETest1()
         {
+            byte[] rom = new byte[]
+            {
+                0x61, // Set 0x08 to V1
+                0x08, // 00000100
+                0x81, // Shift V1 to left
+                0x0E
+            };
+            Chip8 cpu = GetCpuInstance(rom);
+
+            Assert.AreEqual(0x10, cpu.Registers[0x01]);
+            Assert.AreEqual(0x00, cpu.Registers[0x0F]);
+        }
+
+        /// <summary>
+        /// 8XYE Shifts VX left by one. VF is set to the value of the most significant bit of VX before the shift.
+        /// </summary>
+        [TestMethod]
+        public void Opcode8XYETest2()
+        {
+            byte[] rom = new byte[]
+            {
+                0x61, // Set 0x88 to V1
+                0x88, // 10000100
+                0x81, // Shift V1 to left
+                0x0E
+            };
+            Chip8 cpu = GetCpuInstance(rom);
+
+            Assert.AreEqual(0x10, cpu.Registers[0x01]);
+            Assert.AreEqual(0x01, cpu.Registers[0x0F]);
         }
 
         /// <summary>
@@ -337,14 +512,118 @@ namespace Chip8Tests
         [TestMethod]
         public void Opcode9XY0Test1()
         {
+            byte[] rom = new byte[]
+            {
+                0x61, // Set 0x08 to V1
+                0x08,
+                0x62, // Set 0x09 to V2
+                0x09,
+                0x63, // Set 0x08 to V3
+                0x08,
+                0x64, // Set 0x00 to V4
+                0x00,
+                0x65, // Set 0x00 to V5
+                0x00,
+
+                0x91, // Skip if V1 != V2
+                0x20,
+                0x64, // Set 0x01 to V4
+                0x01,
+
+                0x91, // Skip if V1 != V3
+                0x30,
+                0x65, // Set 0x01 to V5
+                0x01
+            };
+            Chip8 cpu = GetCpuInstance(rom);
+
+            Assert.AreEqual(0x00, cpu.Registers[0x04]);
+            Assert.AreEqual(0x01, cpu.Registers[0x05]);
         }
 
-        private Chip8 GetCpuInstance(byte[] rom)
+        /// <summary>
+        /// ANNN Sets I to the address NNN.
+        /// </summary>
+        [TestMethod]
+        public void OpcodeANNNTest1()
+        {
+            byte[] rom = new byte[]
+            {
+                0xA1, // Set 0x0123 to I
+                0x23
+            };
+            Chip8 cpu = GetCpuInstance(rom);
+
+            Assert.AreEqual(0x0123, cpu.AddressI);
+        }
+
+        /// <summary>
+        /// BNNN Jumps to the address NNN plus V0.
+        /// </summary>
+        [TestMethod]
+        public void OpcodeBNNNTest1()
+        {
+            byte[] rom = new byte[]
+            {
+                0x60, // Set 0x02 to V0
+                0x02,
+                0xB1, // Set 0x0123 + V0 to ProgramCounter
+                0x23
+            };
+            Chip8 cpu = GetCpuInstance(rom);
+
+            Assert.AreEqual(0x0125, cpu.ProgramCounter);
+        }
+
+        /// <summary>
+        /// BNNN Jumps to the address NNN plus V0.
+        /// </summary>
+        [TestMethod]
+        public void OpcodeBNNNTest2()
+        {
+            byte[] rom = new byte[]
+            {
+                0x60, // Set 0x02 to V0
+                0x02,
+                0xBF, // Set 0x0FFF + V0 to ProgramCounter
+                0xFF
+            };
+            Chip8 cpu = GetCpuInstance(rom);
+
+            Assert.AreEqual(0x01, cpu.ProgramCounter);
+        }
+
+        /// <summary>
+        /// CXNN Sets VX to a random number and NN.
+        /// </summary>
+        [TestMethod]
+        public void OpcodeCXNNTest1()
+        {
+            byte[] rom = new byte[]
+            {
+                0xC1, // RND V1
+                0xAA, //10101010
+                0xC2, // RND V2
+                0xAA, //10101010
+                0xC3, // RND V3
+                0xFF  //10101010
+            };
+            Chip8 cpu = GetCpuInstance(rom);
+
+            Assert.IsFalse(cpu.Registers[0x01] == cpu.Registers[0x02] 
+                            && cpu.Registers[0x01] == cpu.Registers[0x03]);
+            Assert.AreEqual(0x00, cpu.Registers[0x01] & 0x55 /* 01010101 */);
+        }
+
+        private Chip8 GetCpuInstance(byte[] rom, int steps = 0)
         {
             Chip8 cpu = new Chip8();
             cpu.LoadRom(rom);
 
-            for (int i = 0; i < rom.Length / 2; i++)
+            if (steps == 0)
+                steps = rom.Length / 2;
+
+            for (int i = 0; i < steps; i++)
                 cpu.ExecuteNextOpcode();
 
             return cpu;

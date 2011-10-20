@@ -8,7 +8,7 @@ namespace Chip8Emulator
 {
     public partial class MainPage : UserControl
     {
-        private const int FPU = 50;
+        private const int FPU = 30;
         private const int operations = 5000;
 
         private Chip8 cpu;

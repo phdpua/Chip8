@@ -63,23 +63,10 @@ namespace Chip8Emulator
             LoadFonts();
         }
 
-        void ClearScreen() // "Очищает" дисплей
-        {
-            for (int x = 0; x < 640; x++)
-            {
-                for (int y = 0; y < 320; y++)
-                {
-                    ScreenData[y, x, 0] = 255;
-                    ScreenData[y, x, 1] = 255;
-                    ScreenData[y, x, 2] = 255;
-                }
-            }
-        }
-
         public bool LoadRom(string romName) // Загружает программу в "память"
         {
             CPUReset();
-            ClearScreen();
+            Opcode00E0();
 
             try
             {
@@ -105,7 +92,7 @@ namespace Chip8Emulator
         public bool LoadRom(byte[] rom)
         {
             CPUReset();
-            ClearScreen();
+            Opcode00E0();
 
             try
             {
@@ -200,7 +187,7 @@ namespace Chip8Emulator
         {
             switch (opcode & 0xF)
             {
-                case 0x0: ClearScreen(); break;
+                case 0x0: Opcode00E0(); break;
                 case 0xE: Opcode00EE(); break;
                 default: break;
             }
@@ -230,6 +217,22 @@ namespace Chip8Emulator
                 case 0x55: OpcodeFX55(opcode); break;
                 case 0x65: OpcodeFX65(opcode); break;
                 default: break;
+            }
+        }
+
+        // "Очищает" дисплей
+        private void Opcode00E0()
+        {
+            //Array.Clear(ScreenData, 0, ScreenData.Length);
+
+            for (int x = 0; x < 640; x++)
+            {
+                for (int y = 0; y < 320; y++)
+                {
+                    ScreenData[y, x, 0] = 0xFF;
+                    ScreenData[y, x, 1] = 0xFF;
+                    ScreenData[y, x, 2] = 0xFF;
+                }
             }
         }
 
@@ -442,7 +445,7 @@ namespace Chip8Emulator
         void OpcodeBNNN(UInt16 opcode)
         {
             int nnn = opcode & 0x0FFF;
-            ProgramCounter = (UInt16)(Registers[0] + nnn);
+            ProgramCounter = (UInt16)((Registers[0] + nnn) & 0x0FFF);
         }
 
         // Присваивает vx значение random + NN
