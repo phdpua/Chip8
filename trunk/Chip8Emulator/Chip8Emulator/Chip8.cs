@@ -45,20 +45,13 @@ namespace Chip8Emulator
         {
             AddressI = 0;
             ProgramCounter = 0x200;
-            for (int i = 0; i < Registers.GetLength(0); i++ )
-            {
-                Registers[i] = 0;
-            }
-            for (int i = 0; i < Memory.GetLength(0); i++)
-            {
-                Memory[i] = 0;
-            }
-            for (int i = 0; i < KeyState.GetLength(0); i++)
-            {
-                KeyState[i] = 0;
-            }
+            Array.Clear(Registers, 0, Registers.Length);
+            Array.Clear(Memory, 0, Memory.Length);
+            Array.Clear(KeyState, 0, KeyState.Length);
             DelayTimer = 0;
             SoundTimer = 0;
+
+            Opcode00E0();
 
             LoadFonts();
         }
@@ -66,7 +59,6 @@ namespace Chip8Emulator
         public bool LoadRom(string romName) // Загружает программу в "память"
         {
             CPUReset();
-            Opcode00E0();
 
             try
             {
@@ -223,23 +215,16 @@ namespace Chip8Emulator
         // "Очищает" дисплей
         private void Opcode00E0()
         {
-            //Array.Clear(ScreenData, 0, ScreenData.Length);
-
-            for (int x = 0; x < 640; x++)
-            {
-                for (int y = 0; y < 320; y++)
-                {
-                    ScreenData[y, x, 0] = 0xFF;
-                    ScreenData[y, x, 1] = 0xFF;
-                    ScreenData[y, x, 2] = 0xFF;
-                }
-            }
+            Array.Clear(ScreenData, 0, ScreenData.Length);
         }
 
         // Возвращение из метода
         private void Opcode00EE()
         {
-            ProgramCounter = Stack.Pop();
+            if (Stack.Count > 0)
+            {
+                ProgramCounter = Stack.Pop();
+            }
         }
 
         // Переход к адресу NNN
@@ -251,8 +236,11 @@ namespace Chip8Emulator
         // Вызов метода по адресу NNN
         private void Opcode2NNN(UInt16 opcode)
         {
-            Stack.Push(ProgramCounter);
-            ProgramCounter = (UInt16)(opcode & 0x0FFF);
+            if (Stack.Count < 16)
+            {
+                Stack.Push(ProgramCounter);
+                ProgramCounter = (UInt16)(opcode & 0x0FFF);
+            }
         }
 
         // Пропускает следующую инструкцию если VX == NN
@@ -299,7 +287,7 @@ namespace Chip8Emulator
             Registers[regx] = (byte)nn;
         }
 
-        // Прибавляет NN к vx
+        // Прибавляет NN к VX
         private void Opcode7XNN(UInt16 opcode)
         {
             int nn = opcode & 0x00FF;
@@ -356,7 +344,6 @@ namespace Chip8Emulator
         // Прибавляет vy к vx. Присваивает флагу значение 1 при переполнении, иначе 0
         private void Opcode8XY4(UInt16 opcode)
         {
-            Registers[0xF] = 0;
             int regx = opcode & 0x0F00;
             regx >>= 8;
             int regy = opcode & 0x00F0;
@@ -364,25 +351,20 @@ namespace Chip8Emulator
 
             int value = Registers[regx] + Registers[regy];
 
-            if (value > 255)
-                Registers[0xF] = 1;
+            Registers[0x0F] = (byte)((value > 255) ? 1 : 0);
 
-            Registers[regx] = (byte)(Registers[regx] + Registers[regy]);
+            Registers[regx] = (byte)(value);
         }
 
         // Вычитает vy из vx. Присваивает флагу значение 1 если vy > vx, иначе 0
         private void Opcode8XY5(UInt16 opcode)
         {
-            Registers[0xF] = 1;
-
             int regx = opcode & 0x0F00;
             regx >>= 8;
             int regy = opcode & 0x00F0;
             regy >>= 4;
 
-            if (Registers[regx] < Registers[regy])
-                Registers[0xF] = 0;
-
+            Registers[0x0F] = (byte)((Registers[regx] < Registers[regy]) ? 0 : 1);
             Registers[regx] = (byte)(Registers[regx] - Registers[regy]);
         }
 
@@ -392,39 +374,34 @@ namespace Chip8Emulator
             int regx = opcode & 0x0F00;
             regx >>= 8;
 
-            Registers[0xF] = (byte)(Registers[regx] & 0x1);
+            Registers[0x0F] = (byte)(Registers[regx] & 0x01);
             Registers[regx] >>= 1;
         }
 
         // Присваивает VX значение VY минус VX. VF присваивается значение 0 если VY < VX, иначе 1.
-        void Opcode8XY7(UInt16 opcode)
+        private void Opcode8XY7(UInt16 opcode)
         {
-            Registers[0xF] = 1;
-
             int regx = opcode & 0x0F00;
             regx >>= 8;
             int regy = opcode & 0x00F0;
             regy >>= 4;
 
-            if (Registers[regy] < Registers[regx])
-                Registers[0xF] = 0;
-
+            Registers[0x0F] = (byte)((Registers[regy] < Registers[regx]) ? 0 : 1);
             Registers[regx] = (byte)(Registers[regy] - Registers[regx]);
         }
 
         // Сдвигает VX влево на 1 разряд. VF присваивается значение последнего значащего бита VX перед сдвигом.
-        void Opcode8XYE(UInt16 opcode)
+        private void Opcode8XYE(UInt16 opcode)
         {
             int regx = opcode & 0x0F00;
             regx >>= 8;
 
             Registers[0xF] = (byte)(Registers[regx] >> 7);
             Registers[regx] <<= 1;
-
         }
 
         // Пропускает следующую инструкцию если VX != VY
-        void Opcode9XY0(UInt16 opcode)
+        private void Opcode9XY0(UInt16 opcode)
         {
             int regx = opcode & 0x0F00;
             regx >>= 8;
@@ -436,33 +413,34 @@ namespace Chip8Emulator
         }
 
         // Присваивает I значение nnn
-        void OpcodeANNN(UInt16 opcode)
+        private void OpcodeANNN(UInt16 opcode)
         {
             AddressI = (UInt16)(opcode & 0x0FFF);
         }
 
         // Переход к адресу NNN + V0
-        void OpcodeBNNN(UInt16 opcode)
+        private void OpcodeBNNN(UInt16 opcode)
         {
             int nnn = opcode & 0x0FFF;
             ProgramCounter = (UInt16)((Registers[0] + nnn) & 0x0FFF);
         }
 
         // Присваивает vx значение random + NN
-        void OpcodeCXNN(UInt16 opcode)
+        private void OpcodeCXNN(UInt16 opcode)
         {
             Random rand = new Random();
+            rand.Next(255);
             int nn = opcode & 0x00FF;
             int regx = opcode & 0x0F00;
             regx >>= 8;
 
-            Registers[regx] = (byte)(rand.Next() & nn);
+            Registers[regx] = (byte)(rand.Next(255) & nn);
         }
 
         // Рисует спрайт в координатах (VX, VY) шириной 8 и высотой N пикселей.
         // VF присваивается 1 если пиксель переключается из 1 в 0 при отрисовке спрайта,
         // иначе присваивается 0
-        void OpcodeDXYN(UInt16 opcode)
+        private void OpcodeDXYN(UInt16 opcode)
         {
             const int SCALE = 10;
             int regx = opcode & 0x0F00;
@@ -474,7 +452,7 @@ namespace Chip8Emulator
             int coordy = Registers[regy] * SCALE;
             int height = opcode & 0x000F;
 
-            Registers[0xf] = 0;
+            Registers[0x0F] = 0;
 
             for (int yline = 0; yline < height; yline++)
             {
@@ -493,15 +471,15 @@ namespace Chip8Emulator
                     if ((data & mask) != 0)
                     {
                         int x = (xpixel * SCALE) + coordx;
-                        int y = coordy + (yline * SCALE);
+                        int y = (yline * SCALE) + coordy;
 
-                        int colour = 0;
+                        int colour = 255;
 
                         // Обнаружена коллизия
-                        if (ScreenData[y, x, 0] == 0)
+                        if (ScreenData[y, x, 0] == 255)
                         {
-                            colour = 255;
-                            Registers[15] = 1;
+                            colour = 0;
+                            Registers[0x0F] = 1;
                         }
 
                         // Цвет пикселя
@@ -514,7 +492,6 @@ namespace Chip8Emulator
                                 ScreenData[y + i, x + j, 2] = (byte)colour;
                             }
                         }
-
                     }
                 }
             }

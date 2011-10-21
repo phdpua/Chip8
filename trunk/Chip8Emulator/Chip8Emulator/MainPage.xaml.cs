@@ -63,7 +63,10 @@ namespace Chip8Emulator
             {
                 for (int y = 0; y < 320 - 1; y++)
                 {
-                    bitmap.Pixels[x + y * 640] = (0xFF << 24) | (cpu.ScreenData[y, x, 0] & 0xFF);
+                    bitmap.Pixels[x + y * 640] = (0xFF << 24)
+                        //| (cpu.ScreenData[y, x, 0] & 0xFF) << 16
+                        | (cpu.ScreenData[y, x, 0] & 0xFF) << 8;
+                        //| (cpu.ScreenData[y, x, 0] & 0xFF);
                 }
             }
             bitmap.Invalidate();
