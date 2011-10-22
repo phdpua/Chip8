@@ -614,6 +614,114 @@ namespace Chip8Tests
             Assert.AreEqual(0x00, cpu.Registers[0x01] & 0x55 /* 01010101 */);
         }
 
+        /// <summary>
+        /// DXYN Draws a sprite at coordinate (VX, VY) that has a width of 8 pixels and a height of N pixels...
+        /// </summary>
+        [TestMethod]
+        [Ignore]
+        public void OpcodeDXYNTest1()
+        {
+        }
+
+        /// <summary>
+        /// EX9E Skips the next instruction if the key stored in VX is pressed.
+        /// </summary>
+        [TestMethod]
+        [Ignore]
+        public void OpcodeEX9ETest1()
+        {
+        }
+
+        /// <summary>
+        /// EXA1 Skips the next instruction if the key stored in VX isn't pressed.
+        /// </summary>
+        [TestMethod]
+        [Ignore]
+        public void OpcodeEXA1Test1()
+        {
+        }
+
+        /// <summary>
+        /// FX07 Sets VX to the value of the delay timer.
+        /// </summary>
+        [TestMethod]
+        [Ignore]
+        public void OpcodeFX07Test1()
+        {
+        }
+
+        /// <summary>
+        /// FX0A A key press is awaited, and then stored in VX.
+        /// </summary>
+        [TestMethod]
+        [Ignore]
+        public void OpcodeFX0ATest1()
+        {
+        }
+
+        /// <summary>
+        /// FX15 Sets the delay timer to VX.
+        /// </summary>
+        [TestMethod]
+        [Ignore]
+        public void OpcodeFX15Test1()
+        {
+        }
+
+        /// <summary>
+        /// FX18 Sets the sound timer to VX.
+        /// </summary>
+        [TestMethod]
+        [Ignore]
+        public void OpcodeFX18Test1()
+        {
+        }
+
+        /// <summary>
+        /// FX1E Adds VX to I.[3]
+        /// </summary>
+        [TestMethod]
+        [Ignore]
+        public void OpcodeFX1ETest1()
+        {
+        }
+
+        /// <summary>
+        /// FX29 Sets I to the location of the sprite for the character in VX.
+        /// </summary>
+        [TestMethod]
+        [Ignore]
+        public void OpcodeFX29Test1()
+        {
+        }
+
+        /// <summary>
+        /// FX33 Stores the Binary-coded decimal representation of VX...
+        /// </summary>
+        [TestMethod]
+        [Ignore]
+        public void OpcodeFX33Test1()
+        {
+        }
+
+        /// <summary>
+        /// FX55 Stores V0 to VX in memory starting at address I.[4]
+        /// </summary>
+        [TestMethod]
+        [Ignore]
+        public void OpcodeFX55Test1()
+        {
+        }
+
+        /// <summary>
+        /// FX65 Fills V0 to VX with values from memory starting at address I.[4]
+        /// </summary>
+        [TestMethod]
+        [Ignore]
+        public void OpcodeFX65Test1()
+        {
+        }
+
         private Chip8 GetCpuInstance(byte[] rom, int steps = 0)
         {
             Chip8 cpu = new Chip8();
@@ -669,8 +777,10 @@ FX0A	A key press is awaited, and then stored in VX.
 FX15	Sets the delay timer to VX.
 FX18	Sets the sound timer to VX.
 FX1E	Adds VX to I.[3]
-FX29	Sets I to the location of the sprite for the character in VX. Characters 0-F (in hexadecimal) are represented by a 4x5 font.
-FX33	Stores the Binary-coded decimal representation of VX, with the most significant of three digits at the address in I, the middle digit at I plus 1, and the least significant digit at I plus 2.
+FX29	Sets I to the location of the sprite for the character in VX. Characters 0-F (in hexadecimal) are
+        represented by a 4x5 font.
+FX33	Stores the Binary-coded decimal representation of VX, with the most significant of three digits at
+        the address in I, the middle digit at I plus 1, and the least significant digit at I plus 2.
 FX55	Stores V0 to VX in memory starting at address I.[4]
 FX65	Fills V0 to VX with values from memory starting at address I.[4]
 
