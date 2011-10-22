@@ -627,45 +627,121 @@ namespace Chip8Tests
         /// EX9E Skips the next instruction if the key stored in VX is pressed.
         /// </summary>
         [TestMethod]
-        [Ignore]
         public void OpcodeEX9ETest1()
         {
+            byte[] rom = new byte[]
+            {
+                0x61, // Set 0x02 to V1
+                0x02,
+                0x62, // Set 0x05 to V2
+                0x05,
+                0xE1, // Skip
+                0x9E,
+                0x62, // Set 0x06 to V2
+                0x06,
+                0x61, // Set 0x01 to V1
+                0x01
+            };
+            Chip8 cpu = GetCpuInstance(rom, 2);
+            cpu.KeyPressed(0x02);
+
+            ExecuteCommandsNTime(cpu, 3);
+
+            Assert.AreEqual(0x01, cpu.Registers[0x01]);
+            Assert.AreEqual(0x05, cpu.Registers[0x02]);
         }
 
         /// <summary>
         /// EXA1 Skips the next instruction if the key stored in VX isn't pressed.
         /// </summary>
         [TestMethod]
-        [Ignore]
         public void OpcodeEXA1Test1()
         {
+            byte[] rom = new byte[]
+            {
+                0x61, // Set 0x02 to V1
+                0x02,
+                0x62, // Set 0x05 to V2
+                0x05,
+                0xE1, // Skip
+                0xA1,
+                0x62, // Set 0x06 to V2
+                0x06,
+                0x61, // Set 0x01 to V1
+                0x01
+            };
+            Chip8 cpu = GetCpuInstance(rom, 2);
+            cpu.KeyPressed(0x03);
+
+            ExecuteCommandsNTime(cpu, 3);
+
+            Assert.AreEqual(0x01, cpu.Registers[0x01]);
+            Assert.AreEqual(0x05, cpu.Registers[0x02]);
         }
 
         /// <summary>
         /// FX07 Sets VX to the value of the delay timer.
         /// </summary>
         [TestMethod]
-        [Ignore]
         public void OpcodeFX07Test1()
         {
+            byte[] rom = new byte[]
+            {
+                0x61, // Set 0x05 to V1
+                0x05,
+                0xF1, // Set V1 to timer value
+                0x15,
+                0x61, // Set 0x00 to V1
+                0x00,
+                0xF1, // Set timer value to V1
+                0x07
+            };
+            Chip8 cpu = GetCpuInstance(rom);
+
+            Assert.AreEqual(0x05, cpu.Registers[0x01]);
         }
 
         /// <summary>
         /// FX0A A key press is awaited, and then stored in VX.
         /// </summary>
         [TestMethod]
-        [Ignore]
         public void OpcodeFX0ATest1()
         {
+            byte[] rom = new byte[]
+            {
+                0x61, // Set 0x00 to V1
+                0x00,
+                0xF1, // Wait for pressed key
+                0x0A
+            };
+            Chip8 cpu = GetCpuInstance(rom, 5);
+            cpu.KeyPressed(0x0B);
+
+            ExecuteCommandsNTime(cpu, 1);
+
+            Assert.AreEqual(0x0B, cpu.Registers[0x01]);
         }
 
         /// <summary>
         /// FX15 Sets the delay timer to VX.
         /// </summary>
         [TestMethod]
-        [Ignore]
         public void OpcodeFX15Test1()
         {
+            byte[] rom = new byte[]
+            {
+                0x61, // Set 0x05 to V1
+                0x05,
+                0xF1, // Set V1 to timer value
+                0x15,
+                0x61, // Set 0x00 to V1
+                0x00,
+                0xF1, // Set timer value to V1
+                0x07
+            };
+            Chip8 cpu = GetCpuInstance(rom);
+
+            Assert.AreEqual(0x05, cpu.Registers[0x01]);
         }
 
         /// <summary>
@@ -681,45 +757,164 @@ namespace Chip8Tests
         /// FX1E Adds VX to I.[3]
         /// </summary>
         [TestMethod]
-        [Ignore]
         public void OpcodeFX1ETest1()
         {
+            byte[] rom = new byte[]
+            {
+                0x61, // Set 0x05 to V1
+                0x05,
+                0xA1, // Set 0x0123 to I
+                0x23,
+                0xF1, // Add
+                0x1E
+            };
+            Chip8 cpu = GetCpuInstance(rom);
+
+            Assert.AreEqual(0x0128, cpu.AddressI);
         }
 
         /// <summary>
         /// FX29 Sets I to the location of the sprite for the character in VX.
         /// </summary>
         [TestMethod]
-        [Ignore]
         public void OpcodeFX29Test1()
         {
+            byte[] rom = new byte[]
+            {
+                0x61, // Set 0x05 to V1
+                0x05,
+                0xA1, // Set 0x0123 to I
+                0x23,
+                0xF1, // Add
+                0x29
+            };
+            Chip8 cpu = GetCpuInstance(rom);
+
+            Assert.AreEqual(0x05 * 5, cpu.AddressI);
         }
 
         /// <summary>
         /// FX33 Stores the Binary-coded decimal representation of VX...
         /// </summary>
         [TestMethod]
-        [Ignore]
         public void OpcodeFX33Test1()
         {
+            byte[] rom = new byte[]
+            {
+                0x61, // Set 0xFE to V1
+                0xFE,
+                0xA1, // Set 0x0123 to I
+                0x23,
+                0xF1, // Store to memory
+                0x33,
+                0xF3, // Read from memory
+                0x65
+            };
+            Chip8 cpu = GetCpuInstance(rom);
+
+            Assert.AreEqual(0x02, cpu.Registers[0]);
+            Assert.AreEqual(0x05, cpu.Registers[1]);
+            Assert.AreEqual(0x04, cpu.Registers[2]);
         }
 
         /// <summary>
         /// FX55 Stores V0 to VX in memory starting at address I.[4]
         /// </summary>
         [TestMethod]
-        [Ignore]
         public void OpcodeFX55Test1()
         {
+            byte[] rom = new byte[]
+            {
+                // Init values
+                0xA1, // Set 0x0123 to I
+                0x23,
+                0x60, // Set 0x01 to V0
+                0x01,
+                0x61, // Set 0x02 to V1
+                0x02,
+                0x62, // Set 0x03 to V2
+                0x03,
+                // Action
+                0xF2, // Store to memory
+                0x55,
+                // Cleare registers
+                0x60, // Set 0x00 to V0
+                0x00,
+                0x61, // Set 0x00 to V1
+                0x00,
+                0x62, // Set 0x00 to V2
+                0x00,
+                // Action
+                0xA1, // Set 0x0123 to I
+                0x23,
+                0xF2, // Read from memory
+                0x65
+            };
+            Chip8 cpu = GetCpuInstance(rom, 5);
+
+            Assert.AreEqual(0x125, cpu.AddressI);
+
+            ExecuteCommandsNTime(cpu, 5);
+
+            Assert.AreEqual(0x01, cpu.Registers[0]);
+            Assert.AreEqual(0x02, cpu.Registers[1]);
+            Assert.AreEqual(0x03, cpu.Registers[2]);
+            Assert.AreEqual(0x01, cpu.Memory[0x123]);
+            Assert.AreEqual(0x02, cpu.Memory[0x124]);
+            Assert.AreEqual(0x03, cpu.Memory[0x125]);
         }
 
         /// <summary>
         /// FX65 Fills V0 to VX with values from memory starting at address I.[4]
         /// </summary>
         [TestMethod]
-        [Ignore]
         public void OpcodeFX65Test1()
         {
+            byte[] rom = new byte[]
+            {
+                // Init values
+                0xA1, // Set 0x0123 to I
+                0x23,
+                0x60, // Set 0x01 to V0
+                0x01,
+                0x61, // Set 0x02 to V1
+                0x02,
+                0x62, // Set 0x03 to V2
+                0x03,
+                // Action
+                0xF2, // Store to memory
+                0x55,
+                // Cleare registers
+                0x60, // Set 0x00 to V0
+                0x00,
+                0x61, // Set 0x00 to V1
+                0x00,
+                0x62, // Set 0x00 to V2
+                0x00,
+                // Action
+                0xA1, // Set 0x0123 to I
+                0x23,
+                0xF2, // Read from memory
+                0x65
+            };
+            Chip8 cpu = GetCpuInstance(rom, 5);
+
+            Assert.AreEqual(0x125, cpu.AddressI);
+
+            ExecuteCommandsNTime(cpu, 5);
+
+            Assert.AreEqual(0x01, cpu.Registers[0]);
+            Assert.AreEqual(0x02, cpu.Registers[1]);
+            Assert.AreEqual(0x03, cpu.Registers[2]);
+            Assert.AreEqual(0x01, cpu.Memory[0x123]);
+            Assert.AreEqual(0x02, cpu.Memory[0x124]);
+            Assert.AreEqual(0x03, cpu.Memory[0x125]);
+        }
+
+        private void ExecuteCommandsNTime(Chip8 cpu, int number)
+        {
+            for (int i = 0; i < number; i++)
+                cpu.ExecuteNextOpcode();
         }
 
         private Chip8 GetCpuInstance(byte[] rom, int steps = 0)
@@ -730,8 +925,7 @@ namespace Chip8Tests
             if (steps == 0)
                 steps = rom.Length / 2;
 
-            for (int i = 0; i < steps; i++)
-                cpu.ExecuteNextOpcode();
+            ExecuteCommandsNTime(cpu, steps);
 
             return cpu;
         }
