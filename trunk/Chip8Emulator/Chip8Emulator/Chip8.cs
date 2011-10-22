@@ -18,8 +18,8 @@ namespace Chip8Emulator
         public Stack<UInt16> Stack = new Stack<ushort>(); // 16-битный стек
 
         public byte[] KeyState = new byte[16]; // Клавиатура
-        byte DelayTimer = new byte(); // Таймер задержки
-        byte SoundTimer = new byte(); // Звуковой таймер
+        private byte DelayTimer = new byte(); // Таймер задержки
+        private byte SoundTimer = new byte(); // Звуковой таймер
         public byte[,,] ScreenData = new byte[320, 640, 3]; // Дисплей
 
         private DispatcherTimer delayTimer;
@@ -497,8 +497,8 @@ namespace Chip8Emulator
             }
         }
 
-        //	Пропускает следующую инструкцию, если нажата клавиша хранящаяся в VX.
-        void OpcodeEX9E(UInt16 opcode)
+        // Пропускает следующую инструкцию, если нажата клавиша хранящаяся в VX.
+        private void OpcodeEX9E(UInt16 opcode)
         {
             int regx = opcode & 0x0F00;
             regx >>= 8;
@@ -509,7 +509,7 @@ namespace Chip8Emulator
         }
 
         // Пропускает следующую инструкцию, если не нажата клавиша хранящаяся в VX.
-        void OpcodeEXA1(UInt16 opcode)
+        private void OpcodeEXA1(UInt16 opcode)
         {
             int regx = opcode & 0x0F00;
             regx >>= 8;
@@ -520,7 +520,7 @@ namespace Chip8Emulator
         }
 
         // Присваивает VX значение таймера задержки.
-        void OpcodeFX07(UInt16 opcode)
+        private void OpcodeFX07(UInt16 opcode)
         {
             int regx = opcode & 0x0F00;
             regx >>= 8;
@@ -529,7 +529,7 @@ namespace Chip8Emulator
         }
 
         // Ожидает нажатия клавиши, и сохраняет её в VX.
-        void OpcodeFX0A(UInt16 opcode)
+        private void OpcodeFX0A(UInt16 opcode)
         {
             int regx = opcode & 0x0F00;
             regx >>= 8;
@@ -547,7 +547,7 @@ namespace Chip8Emulator
         }
 
         // Присваивает таймеру значение VX
-        void OpcodeFX15(UInt16 opcode)
+        private void OpcodeFX15(UInt16 opcode)
         {
             int regx = opcode & 0x0F00;
             regx >>= 8;
@@ -556,7 +556,7 @@ namespace Chip8Emulator
         }
 
         // Присваивает звуковому таймеру значение VX
-        void OpcodeFX18(UInt16 opcode)
+        private void OpcodeFX18(UInt16 opcode)
         {
             int regx = opcode & 0x0F00;
             regx >>= 8;
@@ -565,7 +565,7 @@ namespace Chip8Emulator
         }
 
         // Прибавляет vx к I
-        void OpcodeFX1E(UInt16 opcode)
+        private void OpcodeFX1E(UInt16 opcode)
         {
             int regx = opcode & 0x0F00;
             regx >>= 8;
@@ -574,7 +574,7 @@ namespace Chip8Emulator
         }
 
         //Присваивает I координаты спрайта символа в VX. Символы 0-F представлены спрайтами 4x5.
-        void OpcodeFX29(UInt16 opcode)
+        private void OpcodeFX29(UInt16 opcode)
         {
             int regx = opcode & 0x0F00;
             regx >>= 8;
@@ -582,7 +582,7 @@ namespace Chip8Emulator
         }
 
         //Сохраняет бинарно-закодированное десятичное представление VX в адресах I, I + 1, I + 2.
-        void OpcodeFX33(UInt16 opcode)
+        private void OpcodeFX33(UInt16 opcode)
         {
             int regx = opcode & 0x0F00;
             regx >>= 8;
@@ -599,7 +599,7 @@ namespace Chip8Emulator
         }
 
         // Сохраняет V0 в VX начиная с адреса I.
-        void OpcodeFX55(UInt16 opcode)
+        private void OpcodeFX55(UInt16 opcode)
         {
             int regx = opcode & 0x0F00;
             regx >>= 8;
@@ -609,11 +609,11 @@ namespace Chip8Emulator
                 Memory[AddressI + i] = Registers[i];
             }
 
-            AddressI = (UInt16)(AddressI + regx + 1);
+            AddressI = (UInt16)(AddressI + regx);
         }
 
         //Заполняет V0 в VX значениями из памяти начинающейся с адреса I.
-        void OpcodeFX65(UInt16 opcode)
+        private void OpcodeFX65(UInt16 opcode)
         {
             int regx = opcode & 0x0F00;
             regx >>= 8;
@@ -623,7 +623,7 @@ namespace Chip8Emulator
                 Registers[i] = Memory[AddressI + i];
             }
 
-            AddressI = (UInt16)(AddressI + regx + 1);
+            AddressI = (UInt16)(AddressI + regx);
         }
 
         private void LoadFonts()
