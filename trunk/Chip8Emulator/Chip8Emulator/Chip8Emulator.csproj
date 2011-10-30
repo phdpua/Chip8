@@ -101,6 +101,25 @@
     <EmbeddedResource Include="Roms\BLINKY" />
     <EmbeddedResource Include="Roms\VERS" />
     <EmbeddedResource Include="Roms\BLITZ" />
+    <EmbeddedResource Include="Roms\15PUZZLE" />
+    <EmbeddedResource Include="Roms\BRIX" />
+    <EmbeddedResource Include="Roms\CONNECT4" />
+    <EmbeddedResource Include="Roms\GUESS" />
+    <EmbeddedResource Include="Roms\HIDDEN" />
+    <EmbeddedResource Include="Roms\KALEID" />
+    <EmbeddedResource Include="Roms\MAZE" />
+    <EmbeddedResource Include="Roms\MERLIN" />
+    <EmbeddedResource Include="Roms\MISSILE" />
+    <EmbeddedResource Include="Roms\PONG" />
+    <EmbeddedResource Include="Roms\PONG2" />
+    <EmbeddedResource Include="Roms\PUZZLE" />
+    <EmbeddedResource Include="Roms\SYZYGY" />
+    <EmbeddedResource Include="Roms\TANK" />
+    <EmbeddedResource Include="Roms\TETRIS" />
+    <EmbeddedResource Include="Roms\TICTAC" />
+    <EmbeddedResource Include="Roms\UFO" />
+    <EmbeddedResource Include="Roms\VBRIX" />
+    <EmbeddedResource Include="Roms\WIPEOFF" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Silverlight\$(SilverlightVersion)\Microsoft.Silverlight.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

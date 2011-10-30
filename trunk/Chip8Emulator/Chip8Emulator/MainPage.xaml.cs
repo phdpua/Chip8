@@ -55,10 +55,22 @@ namespace Chip8Emulator
             if (timer.IsEnabled)
                 timer.Stop();
 
-            cpu.LoadRom("INVADERS");
+            //cpu.LoadRom("15PUZZLE");
             //cpu.LoadRom("BLINKY");
-            //cpu.LoadRom("VERS");
             //cpu.LoadRom("BLITZ");
+            cpu.LoadRom("BRIX");
+            //cpu.LoadRom("CONNECT4");
+            //cpu.LoadRom("GUESS");
+            //cpu.LoadRom("HIDDEN");
+            //cpu.LoadRom("INVADERS");
+            //cpu.LoadRom("KALEID");
+            //cpu.LoadRom("MAZE");
+            //cpu.LoadRom("MERLIN");
+            //cpu.LoadRom("MISSILE");
+            //cpu.LoadRom("PONG");
+            //cpu.LoadRom("PONG2");
+            //cpu.LoadRom("PUZZLE");
+            //cpu.LoadRom("VERS");
 
             timer.Start();
         }
