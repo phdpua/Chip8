@@ -470,10 +470,10 @@ namespace Chip8Emulator
                     int mask = 1 << xpixelinv;
                     if ((data & mask) != 0)
                     {
-                        int x = (xpixel * SCALE) + coordx;
-                        int y = (yline * SCALE) + coordy;
+                        int x = ((xpixel * SCALE) + coordx) % 640;
+                        int y = ((yline * SCALE) + coordy) % 320;
 
-                        int colour = 255;
+                        byte colour = 255;
 
                         // Обнаружена коллизия
                         if (ScreenData[y, x, 0] == 255)
@@ -487,9 +487,9 @@ namespace Chip8Emulator
                         {
                             for (int j = 0; j < SCALE; j++)
                             {
-                                ScreenData[y + i, x + j, 0] = (byte)colour;
-                                ScreenData[y + i, x + j, 1] = (byte)colour;
-                                ScreenData[y + i, x + j, 2] = (byte)colour;
+                                ScreenData[y + i, x + j, 0] = colour;
+                                //ScreenData[y + i, x + j, 1] = (byte)colour;
+                                //ScreenData[y + i, x + j, 2] = (byte)colour;
                             }
                         }
                     }
