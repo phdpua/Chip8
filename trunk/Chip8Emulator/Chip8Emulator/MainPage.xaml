@@ -7,7 +7,10 @@
     d:DesignHeight="300" d:DesignWidth="400">
 
     <Grid x:Name="LayoutRoot" Background="Beige">
-        <Grid.RowDefinitions>
+
+        <DrawingSurface Draw="DrawingSurface_Draw" />
+
+        <!--<Grid.RowDefinitions>
             <RowDefinition />
             <RowDefinition />
         </Grid.RowDefinitions>
@@ -16,7 +19,7 @@
             <ColumnDefinition />
         </Grid.ColumnDefinitions>
 
-        <Image
+        <Image Visibility="Collapsed"
             x:Name="screen"
             Grid.Row="0"
             Grid.Column="0"
@@ -32,6 +35,6 @@
                 <TextBlock x:Name="keyPressed" />
             </StackPanel>
         </StackPanel>
-        
+        -->
     </Grid>
 </UserControl>

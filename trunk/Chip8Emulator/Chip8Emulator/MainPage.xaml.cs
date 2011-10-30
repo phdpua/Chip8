@@ -3,13 +3,18 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
+using Microsoft.Xna.Framework.Graphics;
+using System.Windows.Graphics;
+using Microsoft.Xna.Framework;
 
 namespace Chip8Emulator
 {
     public partial class MainPage : UserControl
     {
+        Texture2D texture;
+
         private const int FPU = 30;
-        private const int operations = 5000;
+        private const int operations = 500;
 
         private Chip8 cpu;
         private DispatcherTimer timer;
@@ -17,6 +22,8 @@ namespace Chip8Emulator
 
         public MainPage()
         {
+            texture = new Texture2D(GraphicsDeviceManager.Current.GraphicsDevice, 640, 320, false, SurfaceFormat.Color);
+
             InitializeComponent();
 
             this.KeyDown += new KeyEventHandler(RootVisual_KeyDown);
@@ -26,7 +33,7 @@ namespace Chip8Emulator
             timer = new DispatcherTimer();
             bitmap = new WriteableBitmap(640, 320);
 
-            screen.Source = bitmap;
+            //screen.Source = bitmap;
             timer.Tick += new EventHandler(timer_Tick);
             timer.Interval = new TimeSpan(0, 0, 0, 0, 1000 / FPU);
 
@@ -48,28 +55,31 @@ namespace Chip8Emulator
             if (timer.IsEnabled)
                 timer.Stop();
 
-            //cpu.LoadRom("INVADERS");
-            cpu.LoadRom("BLINKY");
+            cpu.LoadRom("INVADERS");
+            //cpu.LoadRom("BLINKY");
+            //cpu.LoadRom("VERS");
+            //cpu.LoadRom("BLITZ");
 
             timer.Start();
         }
 
         private void ProcessFrame()
         {
+
             for (int i = 0; i < operations / FPU; i++)
                 cpu.ExecuteNextOpcode();
 
-            for (int x = 0; x < 640 - 1; x++)
-            {
-                for (int y = 0; y < 320 - 1; y++)
-                {
-                    bitmap.Pixels[x + y * 640] = (0xFF << 24)
-                        //| (cpu.ScreenData[y, x, 0] & 0xFF) << 16
-                        | (cpu.ScreenData[y, x, 0] & 0xFF) << 8;
-                        //| (cpu.ScreenData[y, x, 0] & 0xFF);
-                }
-            }
-            bitmap.Invalidate();
+            //for (int x = 0; x < 640 - 1; x++)
+            //{
+            //    for (int y = 0; y < 320 - 1; y++)
+            //    {
+            //        bitmap.Pixels[x + y * 640] = (0xFF << 24)
+            //            //| (cpu.ScreenData[y, x, 0] & 0xFF) << 16
+            //            | (cpu.ScreenData[y, x, 0] & 0xFF) << 8;
+            //            //| (cpu.ScreenData[y, x, 0] & 0xFF);
+            //    }
+            //}
+            //bitmap.Invalidate();
         }
 
         private void OnKeyHandler(Key key, bool isPressed)
@@ -133,18 +143,45 @@ namespace Chip8Emulator
             if (isPressed && cpu.GetKeyPressed() == -1)
             {
                 cpu.KeyPressed(keyCode);
-                keyPressed.Text = key.ToString();
+                //keyPressed.Text = key.ToString();
             }
             else if (!isPressed && cpu.GetKeyPressed() != -1)
             {
                 cpu.KeyReleased(keyCode);
-                keyPressed.Text = string.Empty;
+                //keyPressed.Text = string.Empty;
             }
         }
 
         private void timer_Tick(object sender, EventArgs e)
         {
             ProcessFrame();
+        }
+
+        private uint[] screenData = new uint[640 * 320];
+        private SpriteBatch spriteBatch = new SpriteBatch(GraphicsDeviceManager.Current.GraphicsDevice);
+
+        private void DrawingSurface_Draw(object sender, DrawEventArgs e)
+        {
+            GraphicsDeviceManager.Current.GraphicsDevice.Textures[0] = null;
+
+            for (int x = 0; x < 640 - 1; x++)
+            {
+                for (int y = 0; y < 320 - 1; y++)
+                {
+                    screenData[x + y * 640] = (UInt32)((0x50 << 24)
+                        | (cpu.ScreenData[y, x, 0] & 0xFF) << 8);
+                }
+            }
+
+            texture.SetData(screenData);
+
+            spriteBatch.Begin();
+
+            spriteBatch.Draw(texture, new Vector2(0, 0), new Color(255, 255, 255));
+
+            spriteBatch.End();
+
+            e.InvalidateSurface();
         }
     }
 }
