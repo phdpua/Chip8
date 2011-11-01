@@ -1,20 +1,41 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
 using System.Windows.Controls;
+using System.Windows.Graphics;
 using System.Windows.Input;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
-using Microsoft.Xna.Framework.Graphics;
-using System.Windows.Graphics;
+using Chip8Emulator.Controls;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace Chip8Emulator
 {
-    public partial class MainPage : UserControl
+    public partial class MainPage : UserControl, INotifyPropertyChanged
     {
-        Texture2D texture;
-
         private const int FPU = 30;
         private const int operations = 500;
+
+        public List<string> RomItems { get; set; }
+
+        public string CurrentRom
+        {
+            get { return currentRom; }
+            set
+            {
+                if (currentRom == value)
+                    return;
+
+                currentRom = value;
+
+                LoadRom();
+                OnPropertyChanged("CurrentRom");
+            }
+        }
+        private string currentRom;
+
+        private Texture2D texture;
 
         private Chip8 cpu;
         private DispatcherTimer timer;
@@ -22,6 +43,8 @@ namespace Chip8Emulator
 
         public MainPage()
         {
+            RomItems = new List<string>(RomLoader.GetRomList());
+
             texture = new Texture2D(GraphicsDeviceManager.Current.GraphicsDevice, 640, 320, false, SurfaceFormat.Color);
 
             InitializeComponent();
@@ -36,8 +59,6 @@ namespace Chip8Emulator
             //screen.Source = bitmap;
             timer.Tick += new EventHandler(timer_Tick);
             timer.Interval = new TimeSpan(0, 0, 0, 0, 1000 / FPU);
-
-            LoadRom();
         }
 
         void RootVisual_KeyDown(object sender, KeyEventArgs e)
@@ -52,32 +73,19 @@ namespace Chip8Emulator
 
         private void LoadRom()
         {
+            if (string.IsNullOrEmpty(CurrentRom))
+                throw new InvalidOperationException("Invalide ROM name");
+
             if (timer.IsEnabled)
                 timer.Stop();
 
-            //cpu.LoadRom("15PUZZLE");
-            //cpu.LoadRom("BLINKY");
-            //cpu.LoadRom("BLITZ");
-            cpu.LoadRom("BRIX");
-            //cpu.LoadRom("CONNECT4");
-            //cpu.LoadRom("GUESS");
-            //cpu.LoadRom("HIDDEN");
-            //cpu.LoadRom("INVADERS");
-            //cpu.LoadRom("KALEID");
-            //cpu.LoadRom("MAZE");
-            //cpu.LoadRom("MERLIN");
-            //cpu.LoadRom("MISSILE");
-            //cpu.LoadRom("PONG");
-            //cpu.LoadRom("PONG2");
-            //cpu.LoadRom("PUZZLE");
-            //cpu.LoadRom("VERS");
+            cpu.LoadRom(CurrentRom);
 
             timer.Start();
         }
 
         private void ProcessFrame()
         {
-
             for (int i = 0; i < operations / FPU; i++)
                 cpu.ExecuteNextOpcode();
 
@@ -195,5 +203,19 @@ namespace Chip8Emulator
 
             e.InvalidateSurface();
         }
+
+        protected void OnPropertyChanged(string propertyName)
+        {
+            var handler = PropertyChanged;
+
+            if (handler != null)
+                handler(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        #region INotifyPropertyChanged Members
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        #endregion
     }
 }
