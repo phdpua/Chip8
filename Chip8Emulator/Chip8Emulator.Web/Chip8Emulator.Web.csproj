@@ -62,7 +62,7 @@
     <Reference Include="System.EnterpriseServices" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Chip8EmulatorTestPage.html" />
+    <Content Include="Default.html" />
     <Content Include="ClientBin\Chip8Emulator.xap" />
     <Content Include="Silverlight.js" />
     <Content Include="Web.config" />
