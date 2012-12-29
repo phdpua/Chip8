@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Text;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Graphics;
 using System.Windows.Input;
@@ -14,8 +16,11 @@ namespace Chip8Emulator
 {
     public partial class MainPage : UserControl, INotifyPropertyChanged
     {
-        private const int FPU = 30;
+        private const int FPU = 25;
         private const int operations = 500;
+
+        private uint[] screenData;
+        private SpriteBatch spriteBatch;
 
         public List<string> RomItems { get; set; }
 
@@ -43,6 +48,13 @@ namespace Chip8Emulator
 
         public MainPage()
         {
+            if (!TestRenderMode())
+                return;
+
+            screenData = new uint[640 * 320];
+
+            spriteBatch = new SpriteBatch(GraphicsDeviceManager.Current.GraphicsDevice);
+
             RomItems = new List<string>(RomLoader.GetRomList());
 
             texture = new Texture2D(GraphicsDeviceManager.Current.GraphicsDevice, 640, 320, false, SurfaceFormat.Color);
@@ -61,12 +73,52 @@ namespace Chip8Emulator
             timer.Interval = new TimeSpan(0, 0, 0, 0, 1000 / FPU);
         }
 
-        void RootVisual_KeyDown(object sender, KeyEventArgs e)
+        private bool TestRenderMode()
+        {
+            StringBuilder sb = new StringBuilder();
+
+            if (GraphicsDeviceManager.Current.RenderMode != RenderMode.Hardware)
+            {
+                switch (GraphicsDeviceManager.Current.RenderModeReason)
+                {
+                    case RenderModeReason.GPUAccelerationDisabled:
+                    case RenderModeReason.SecurityBlocked:
+                        sb.AppendLine("Cannot Load 3D. Please Follow instructions below");
+                        sb.AppendLine("1. Right click on your Silverlight plug-in.");
+                        sb.AppendLine("2. Click the 'Silverlight' option.");
+                        sb.AppendLine("3. Go to the permissions tab.");
+                        sb.AppendLine("4. Find the domain '" + Application.Current.Host.Source.AbsoluteUri.Substring(0, Application.Current.Host.Source.AbsoluteUri.IndexOf(Application.Current.Host.Source.LocalPath)) + "'");
+                        sb.AppendLine("5. When you find the entry, select the item below it '3D Graphics: use blocked display drivers'.");
+                        sb.AppendLine("6. Click 'Allow'");
+                        sb.AppendLine("7. Click 'Ok'");
+                        sb.AppendLine("8. Refresh Page");
+                        break;
+                    case RenderModeReason.Not3DCapable:
+                        sb.AppendLine("Cannot Load 3D.");
+                        sb.AppendLine("Your Graphics card does not support 3D");
+                        break;
+                    case RenderModeReason.TemporarilyUnavailable:
+                        sb.AppendLine("Cannot Load 3D. Please Follow instructions below");
+                        sb.AppendLine("1. Right click on your Silverlight plug-in.");
+                        sb.AppendLine("2. Click the 'Silverlight' option.");
+                        sb.AppendLine("3. Go to the permissions tab.");
+                        sb.AppendLine("4. Find the domain '" + Application.Current.Host.Source.AbsoluteUri.Substring(0, Application.Current.Host.Source.AbsoluteUri.IndexOf(Application.Current.Host.Source.LocalPath)) + "'");
+                        sb.AppendLine("5. When you find the entry, select the item below it '3D Graphics: use blocked display drivers'.");
+                        sb.AppendLine("6. Click 'Allow'");
+                        sb.AppendLine("7. Click 'Ok'");
+                        break;
+                }
+            }
+
+            return string.IsNullOrEmpty(sb.ToString());
+        }
+
+        private void RootVisual_KeyDown(object sender, KeyEventArgs e)
         {
             OnKeyHandler(e.Key, true);
         }
 
-        void RootVisual_KeyUp(object sender, KeyEventArgs e)
+        private void RootVisual_KeyUp(object sender, KeyEventArgs e)
         {
             OnKeyHandler(e.Key, false);
         }
@@ -176,9 +228,6 @@ namespace Chip8Emulator
         {
             ProcessFrame();
         }
-
-        private uint[] screenData = new uint[640 * 320];
-        private SpriteBatch spriteBatch = new SpriteBatch(GraphicsDeviceManager.Current.GraphicsDevice);
 
         private void DrawingSurface_Draw(object sender, DrawEventArgs e)
         {
