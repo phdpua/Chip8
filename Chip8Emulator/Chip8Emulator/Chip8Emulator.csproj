@@ -140,6 +140,12 @@
   <ItemGroup>
     <Folder Include="Video\" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\CPI.Audio\CPI.Audio.csproj">
+      <Project>{96c0e0c7-891a-44ff-861a-6b0d7a4882bd}</Project>
+      <Name>CPI.Audio</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Silverlight\$(SilverlightVersion)\Microsoft.Silverlight.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

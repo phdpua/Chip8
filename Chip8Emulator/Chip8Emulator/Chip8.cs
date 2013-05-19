@@ -22,10 +22,13 @@ namespace Chip8Emulator
         private byte SoundTimer = new byte(); // Звуковой таймер
         public byte[,,] ScreenData = new byte[320, 640, 3]; // Дисплей
 
+        private SoundCard soundCard;
         private DispatcherTimer delayTimer;
 
         public Chip8()
         {
+            soundCard = new SoundCard();
+
             delayTimer = new DispatcherTimer();
             delayTimer.Interval = new TimeSpan(0, 0, 0, 0, 1000 / 60);
             delayTimer.Tick += new EventHandler(delayTimer_Tick);
@@ -38,7 +41,18 @@ namespace Chip8Emulator
                 DelayTimer--;
 
             if (SoundTimer > 0)
+            {
                 SoundTimer--;
+
+                if (SoundTimer == 0)
+                {
+                    soundCard.Stop();
+                }
+                else
+                {
+                    soundCard.Beep();
+                }
+            }
         }
 
         public void CPUReset() // "Перезагружает" эмулятор очищая переменные
